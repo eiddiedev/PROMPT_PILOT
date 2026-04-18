@@ -3,18 +3,14 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { promptSeeds, communitySpotlights } from '../../../seed/promptSeeds';
+import { usePersistentPromptState } from '../../hooks/usePersistentPromptState';
 
 export default function FavoritesPage() {
   const router = useRouter();
-  const [favorites, setFavorites] = useState<string[]>([]);
   const [favoriteItems, setFavoriteItems] = useState<any[]>([]);
+  const { favorites, ratings, usageCounts, toggleFavorite, setRating, recordUsage } = usePersistentPromptState();
 
   useEffect(() => {
-    const savedFavorites = localStorage.getItem('favorites');
-    if (savedFavorites) {
-      setFavorites(JSON.parse(savedFavorites));
-    }
-
     document.body.style.opacity = '0';
     setTimeout(() => {
       document.body.style.transition = 'opacity 0.5s ease';
@@ -54,14 +50,6 @@ export default function FavoritesPage() {
     }
   };
 
-  const toggleFavorite = (id: string) => {
-    const newFavorites = favorites.includes(id) 
-      ? favorites.filter(item => item !== id) 
-      : [...favorites, id];
-    setFavorites(newFavorites);
-    localStorage.setItem('favorites', JSON.stringify(newFavorites));
-  };
-
   const handleItemClick = (item: any) => {
     if (item.id) {
       recordUsage(item.id);
@@ -74,27 +62,12 @@ export default function FavoritesPage() {
     }
   };
 
-  const recordUsage = (id: string) => {
-    const usageData = JSON.parse(localStorage.getItem('promptUsage') || '{}');
-    usageData[id] = (usageData[id] || 0) + 1;
-    localStorage.setItem('promptUsage', JSON.stringify(usageData));
-  };
-
   const getUsageCount = (id: string): number => {
-    const usageData = JSON.parse(localStorage.getItem('promptUsage') || '{}');
-    return usageData[id] || 0;
+    return usageCounts[id] || 0;
   };
 
   const getEfficiency = (id: string): number => {
-    // 从本地存储获取用户评分
-    const ratingsData = JSON.parse(localStorage.getItem('promptRatings') || '{}');
-    return ratingsData[id] || 0;
-  };
-
-  const setRating = (id: string, rating: number) => {
-    const ratingsData = JSON.parse(localStorage.getItem('promptRatings') || '{}');
-    ratingsData[id] = rating;
-    localStorage.setItem('promptRatings', JSON.stringify(ratingsData));
+    return ratings[id] || 0;
   };
 
   return (
@@ -136,6 +109,7 @@ export default function FavoritesPage() {
                 <p className="font-mono text-sm text-muted">
                   你收藏的提示词，可直接使用和管理。
                 </p>
+                <p className="mt-2 font-mono text-xs text-muted">收藏与评分保存在当前浏览器中。</p>
               </div>
 
               {favoriteItems.length > 0 ? (
@@ -182,11 +156,9 @@ export default function FavoritesPage() {
                                 </button>
                               ))}
                             </div>
-                            <span className="font-mono text-xs font-bold">{getEfficiency(item.id)}%</span>
-                            <br />
                             <span className="text-xs text-muted">评分</span>
                           </div>
-                          <div className="border border-line p-1">
+                          <div className="border border-line p-1 flex items-center justify-center">
                             <span className="font-mono text-xs font-bold">→</span>
                           </div>
                         </div>

@@ -1,82 +1,104 @@
 # PROMPT_PILOT
 
-AI 编程 / 学习场景的 Prompt 管理与优化平台。
+面向 AI 编程与学习场景的 Prompt 工作台。
 
-这是一个为黑客松快速构建的 Web MVP，目标不是做“又一个 Prompt 收藏站”，而是把 Prompt 作为可管理、可匹配、可优化、可追溯的资产来展示。
+`PROMPT_PILOT` 不是一个普通的 Prompt 收藏夹，而是把 Prompt 当成`可分析、可进化、可推荐、可沉淀`的工作流资产来管理。
 
-## Why This Exists
+## Core Highlights
 
-在 AI 编程工作流里，Prompt 往往不是一次性文本，而是会不断经历：
+### 1. Prompt Match
 
-- 场景选择
-- 匹配推荐
-- 使用反馈
-- 迭代优化
-- 收藏沉淀
+不是简单关键词检索，而是根据任务目标给出可解释推荐。
 
-`PROMPT_PILOT` 想解决的就是这个问题：
+- 返回 `Top Matches`
+- 展示 `Why This Prompt`
+- 给出 `Best For / Tradeoff`
+- 用 `Prompt DNA` 展示质量画像
 
-`别人管理 Prompt 文本，我们管理 Prompt 的使用场景与进化过程。`
+### 2. Prompt Evolution
 
-## Core Features
+不是只改写一句 Prompt，而是把 Prompt 的优化过程可视化。
 
-### 1. Prompt Library
+- 输入原始 Prompt 和使用反馈
+- 输出优化后的 Prompt
+- 展示 `Prompt Delta`
+- 展示 `Before / After`
+- 展示 `Prompt DNA Before / After`
 
-- 按场景分类浏览 Prompt
-- 支持 `codegen / debug / study / interview`
-- 支持查看详情、复制、收藏、分享思路
+### 3. Prompt DNA
 
-### 2. Prompt Match
+每条 Prompt 都会从四个维度做画像：
 
-- 输入需求后匹配最适合的 Prompt
-- 给出匹配分数和推荐原因
-- 让用户快速找到当前任务最合适的 Prompt
+- `Clarity 清晰度`
+- `Structure 结构性`
+- `Constraint 约束强度`
+- `Reusability 可复用性`
 
-### 3. Prompt Optimize
+这让 Prompt 不再只是文本，而是可以被评估和解释的资产。
 
-- 输入原始 Prompt 或需求
-- 生成更规范、更工程化的优化版本
-- 同时给出优化说明
+### 4. Community-Style Curation
 
-### 4. Community-Style Prompt Curation
+社区精选不是静态摆设，而是会结合本地真实交互行为动态浮出高价值 Prompt。
 
-- 内置精选 Prompt 与来源索引
-- 支持展示 Prompt 来源与适用场景
-- 强调 Prompt 的可追溯性，而不是纯复制粘贴
+- 高评分 Prompt 更容易进入精选
+- 高频使用 Prompt 更容易进入精选
+- 收藏行为会参与热度排序
 
-## Product Positioning
+### 5. Source-Traceable Prompt Library
 
-这个项目不是通用 Prompt marketplace，而是面向 AI 编程和学习场景的 Prompt 工作台。
+项目内置的 Prompt 都带有来源与改写说明，适合答辩时讲“为什么这些 Prompt 值得信任”。
 
-更适合这类使用者：
+- 来源可追溯
+- 场景可解释
+- 标签可筛选
+- 适合继续扩展为团队 Prompt 资产库
 
-- 使用 Trae / Copilot / Claude / DeepSeek 进行编程的人
-- 需要整理高质量开发 Prompt 的学生与开发者
-- 想把 Prompt 从“灵感”变成“资产”的团队
+## Why It Stands Out
 
-## Design Direction
+在 AI 编程场景里，痛点通常不是“没有 Prompt”，而是：
 
-UI 采用：
+- 不知道当前任务最适合哪条 Prompt
+- 好 Prompt 用完就丢，无法形成反馈闭环
+- 团队无法判断一个 Prompt 为什么好、差在哪
+- 社区 Prompt 很多，但很难快速筛出真正能用的
 
-- 黑白工业栅格
-- 档案面板式布局
-- 少量橙色强调
-- 强信息层级、弱花哨装饰
+`PROMPT_PILOT` 试图解决的就是这个问题：
 
-视觉规范见：
+`把 Prompt 从一次性输入框文本，升级成可管理、可分析、可优化的工作流系统。`
 
-- [docs/ui-style-spec.md](./docs/ui-style-spec.md)
+## What Is Already Built
 
-## Data & Sources
+- Prompt 分类管理
+- Prompt 详情查看、复制、收藏、评分
+- 任务到 Prompt 的智能匹配
+- Prompt 优化与进化展示
+- Prompt DNA 质量画像
+- 社区精选逻辑
+- 本地持久化状态
+- 来源追溯与公开来源整理
 
-项目内已预置大量 Prompt 种子，并统一整理成结构化数据。
+## Built-In Prompt Data
+
+项目内已预置并整理了多批 Prompt 种子数据，统一收敛为适合产品消费的结构。
+
+当前内置覆盖：
+
+- `codegen`
+- `debug`
+- `study`
+- `interview`
+- `product`
+- `research`
+- `creative`
+
+总计 `50+` 条结构化 Prompt 种子，覆盖 AI 编程、学习、调试、产品分析、研究与创意场景。
 
 主要数据文件：
 
 - [seed/promptSeeds.ts](./seed/promptSeeds.ts)
 - [docs/source-index.md](./docs/source-index.md)
 
-来源参考包括：
+数据来源参考包括：
 
 - [prompts.chat / f/awesome-chatgpt-prompts](https://github.com/f/awesome-chatgpt-prompts)
 - [browser-use/awesome-prompts](https://github.com/browser-use/awesome-prompts)
@@ -84,7 +106,15 @@ UI 采用：
 - [harish-garg/gemini-cli-prompt-library](https://github.com/harish-garg/gemini-cli-prompt-library)
 - 若干 interview / prompt engineering 相关 gist
 
-这些来源已被重新分类和改写，以适配当前产品结构。
+这些内容均已按当前产品结构重组、筛选与改写。
+
+## Product Surface
+
+- `/` - Prompt 主库与社区精选
+- `/match` - Prompt Match
+- `/optimize` - Prompt Evolution
+- `/favorites` - 收藏与回看
+- `/prompt/[id]` - 单条 Prompt 详情
 
 ## Tech Stack
 
@@ -95,13 +125,13 @@ UI 采用：
 
 ## Local Development
 
-### 1. Install
+### Install
 
 ```bash
 npm install
 ```
 
-### 2. Configure env
+### Configure
 
 Create `.env.local`:
 
@@ -109,7 +139,7 @@ Create `.env.local`:
 DEEPSEEK_API_KEY=your_api_key_here
 ```
 
-### 3. Run
+### Run
 
 ```bash
 npm run dev
@@ -121,19 +151,12 @@ Open:
 http://localhost:3000
 ```
 
-### 4. Production build
+### Production Build
 
 ```bash
 npm run build
 npm run start
 ```
-
-## Pages
-
-- `/` - 首页 Prompt 库
-- `/match` - Prompt 匹配
-- `/optimize` - Prompt 优化
-- `/favorites` - 收藏页
 
 ## Project Structure
 
@@ -146,30 +169,22 @@ docs/ui-style-spec.md    visual system
 docs/traesolo-prompt-v2.md
 ```
 
-## Hackathon Angle
+## Design Direction
 
-这个项目最适合这样展示：
+产品采用黑白工业栅格、档案面板式布局与少量橙色强调，整体更接近 AI 工具工作台，而不是传统 SaaS 仪表盘。
 
-1. 用户输入需求
-2. 系统匹配最适合的 Prompt
-3. 用户提交反馈
-4. 系统生成优化后的 Prompt
-5. 用户收藏并沉淀为个人资产
+视觉规范见：
 
-一句话介绍可以说：
+- [docs/ui-style-spec.md](./docs/ui-style-spec.md)
 
-`PROMPT_PILOT is a prompt operating desk for AI coding workflows, not just a prompt collection site.`
-
-## Next Steps
-
-如果继续迭代，优先级建议：
+## Roadmap
 
 - Prompt 版本历史
-- 优化前后评分对比
-- 来源筛选与推荐理由
-- Prompt DNA / 质量画像
+- 优化前后更细粒度的效果对比
+- 来源筛选与推荐理由强化
+- 团队协作与共享资产库
 - 云端同步与用户系统
-- 真实社区上传与收藏网络
+- 真实社区上传与互动网络
 
 ## License
 

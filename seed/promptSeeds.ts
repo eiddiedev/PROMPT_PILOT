@@ -773,6 +773,94 @@ export const promptSeeds: PromptSeed[] = [
     sourceUrl: "https://github.com/browser-use/awesome-prompts",
     adaptationNote: "基于产品设计最佳实践，重写为适合快速生成 PRD 的中文 Prompt。",
   },
+  {
+    id: "product-jtbd-prioritizer",
+    title: "JTBD 需求优先级分析器",
+    category: "product",
+    summary: "把一堆需求、抱怨和想法，整理成 Jobs-to-be-Done 视角下的优先级列表。",
+    scenario: "适合 feature request 太多、团队意见分散、需要重新抓主线价值的时候。",
+    tags: ["JTBD", "Prioritization", "Discovery", "Feature Requests"],
+    prompt: `请作为一名有判断力的产品经理，帮我用 Jobs-to-be-Done 的视角分析下面这些需求与反馈。
+
+请输出：
+1. 用户真正想完成的核心任务
+2. 每条需求分别解决了哪个 job
+3. 哪些只是表层诉求，哪些是底层痛点
+4. 优先级建议（High / Medium / Low）
+5. 如果只能先做 3 件事，应该做什么以及为什么
+6. 哪些需求应该延后、删除或换一种实现方式
+
+要求：
+- 不要只复述需求
+- 优先判断价值密度和是否贴近真实用户任务
+- 如果需求彼此冲突，请指出冲突点
+- 最后给一个适合 MVP 的排序结果
+
+输入内容：
+{{feature_requests_or_feedback}}`,
+    sourceLabel: "Dean Peters Product Manager Prompts",
+    sourceUrl: "https://github.com/deanpeters/product-manager-prompts",
+    adaptationNote: "参考该仓库围绕 JTBD 与 feature prioritization 的产品管理问题组织方式，改写为适合中文产品讨论的优先级 Prompt。",
+  },
+  {
+    id: "product-positioning-alignment",
+    title: "产品定位对齐器",
+    category: "product",
+    summary: "帮助把一句模糊想法整理成清晰的目标用户、场景、价值和差异化表述。",
+    scenario: "适合早期项目、黑客松题目、内部方案评审前快速统一产品定位。",
+    tags: ["Positioning", "Messaging", "Strategy", "Alignment"],
+    prompt: `请把下面的产品想法，整理成一份团队可共识的产品定位说明。
+
+输出结构：
+1. 目标用户是谁
+2. 他们当前最痛的场景是什么
+3. 我们的产品承诺解决什么问题
+4. 与现有替代方案相比的关键差异
+5. 一句话定位
+6. 面向团队的版本：内部定位说明
+7. 面向外部的版本：对外介绍文案
+
+要求：
+- 不要写成营销套话
+- 要明确“不是给所有人做的”
+- 如果产品边界不清，请主动压缩范围
+- 最后给一版更适合黑客松 MVP 的简化定位
+
+产品描述：
+{{product_brief}}`,
+    sourceLabel: "Dean Peters Product Manager Prompts",
+    sourceUrl: "https://github.com/deanpeters/product-manager-prompts",
+    adaptationNote: "参考该仓库中 positioning statement framework 的问题导向，改写为更适合快速产品对齐的中文 Prompt。",
+  },
+  {
+    id: "product-user-story-backlog-builder",
+    title: "用户故事与 Backlog 生成器",
+    category: "product",
+    summary: "把产品目标拆成按用户流程排序的 user stories、acceptance criteria 和 MVP backlog。",
+    scenario: "适合从想法进入开发前，把需求写成工程团队能直接接住的格式。",
+    tags: ["User Stories", "Backlog", "Gherkin", "Acceptance Criteria"],
+    prompt: `请根据下面的产品描述，为我生成一份按用户流程组织的产品 backlog。
+
+输出必须包含：
+1. 高层用户流程列表
+2. 按顺序排列的 user stories
+3. 每条 story 的用户角色、目标、收益
+4. 最关键的 acceptance criteria
+5. 如适合，请补充简短 Gherkin 场景
+6. 哪些属于 MVP，哪些属于后续版本
+
+要求：
+- user story 采用 “As a / I want / so that” 结构
+- 优先覆盖端到端主流程
+- 避免写成过细的开发任务
+- 输出结果要能直接拿去做需求评审
+
+产品描述：
+{{product_description}}`,
+    sourceLabel: "User Story Examples",
+    sourceUrl: "https://github.com/seanrioux/user-story-examples",
+    adaptationNote: "参考该仓库中 user stories、Gherkin 与 backlog 的组织方式，改写为更适合产品到工程交接的中文 Prompt。",
+  },
   // 研究分析分类
   {
     id: "research-market-analysis",
@@ -800,6 +888,96 @@ export const promptSeeds: PromptSeed[] = [
     sourceLabel: "Market Research Frameworks",
     sourceUrl: "https://github.com/browser-use/awesome-prompts",
     adaptationNote: "基于市场研究框架，重写为适合快速分析市场的中文 Prompt。",
+  },
+  {
+    id: "research-deep-research-brief",
+    title: "深度研究总控 Prompt",
+    category: "research",
+    summary: "把一个研究主题扩写成结构化、可验证、可继续迭代的深度研究任务书。",
+    scenario: "适合调研一个新赛道、新技术或新市场时，先把研究边界和输出结构定清楚。",
+    tags: ["Deep Research", "Brief", "Structured Output", "Evidence"],
+    prompt: `请围绕下面的研究主题，生成一份高质量深度研究任务书。
+
+输出必须包含：
+1. 研究目标与核心问题
+2. 研究范围与不研究的内容
+3. 需要重点查证的数据与证据类型
+4. 研究步骤拆解
+5. 最终输出格式
+6. 如何标记不确定信息与待验证点
+
+要求：
+- 优先使用权威英文资料进行检索，但用中文输出
+- 对所有重要判断给出证据类型建议
+- 不要把多个大问题混成一团
+- 结尾给一个适合 AI 执行的最终研究 Prompt
+
+研究主题：
+{{research_topic}}`,
+    sourceLabel: "Awesome Deep Research Prompts",
+    sourceUrl: "https://github.com/langgptai/awesome-deep-research-prompts",
+    adaptationNote: "参考该仓库中 deep research、research plan 与 evidence-oriented 写法，改写为适合平台沉淀的中文研究任务 Prompt。",
+  },
+  {
+    id: "research-competitor-teardown",
+    title: "竞品拆解与对位分析器",
+    category: "research",
+    summary: "把竞品官网、定价、定位、产品能力和近期动态整理成一份可对比的结构化报告。",
+    scenario: "适合做新项目开题、产品立项、功能差异化判断和答辩材料准备。",
+    tags: ["Competitors", "Teardown", "Positioning", "Comparison"],
+    prompt: `请对下面的目标公司或产品做一份结构化竞品拆解。
+
+输出内容：
+1. 核心定位与目标用户
+2. 主要功能与价值主张
+3. 定价与商业模式
+4. 竞争优势与短板
+5. 最近 3 个月的重要动态
+6. 和我们相比可借鉴什么、必须避开什么
+7. 最终对位建议：我们应该站在哪个差异化位置
+
+要求：
+- 尽量基于官网、定价页、新闻或公开资料
+- 不要只做表层罗列
+- 重点总结“为什么用户会选它”
+- 最后给一个对创始人/评委可直接汇报的精简结论
+
+分析对象：
+{{competitor_target}}`,
+    sourceLabel: "Browser Use Awesome Prompts - Competitor Analysis Extraction",
+    sourceUrl: "https://github.com/browser-use/awesome-prompts/blob/main/README.md",
+    adaptationNote: "参考其中 competitor analysis extraction 的字段设计，改写为更贴近产品战略对位的中文 Prompt。",
+  },
+  {
+    id: "research-product-market-fit-validator",
+    title: "产品市场验证研究员",
+    category: "research",
+    summary: "围绕一个产品想法系统回答：值不值得做、用户会不会买、利润空间在哪里。",
+    scenario: "适合独立开发者、黑客松项目、早期创业想法做 PMF 方向判断。",
+    tags: ["PMF", "Validation", "Market Fit", "Indie Hacking"],
+    prompt: `请作为一名严谨的产品市场研究员，帮我验证下面这个产品想法是否值得继续投入。
+
+请输出：
+1. 目标用户画像
+2. 他们真正的痛点与现有替代方案
+3. 为什么会买 / 为什么不会买
+4. 潜在收入空间与定价区间
+5. 可能的运营成本与利润空间
+6. 适合去哪里验证需求
+7. 最小验证实验建议
+8. 最终结论：继续做 / 谨慎验证 / 暂缓
+
+要求：
+- 如果证据不充分，要明确标记出来
+- 不允许编造数据
+- 尽量给出可执行的验证动作，而不只是结论
+- 请站在“一个没有预算的独立开发者”视角给建议
+
+产品想法：
+{{product_idea}}`,
+    sourceLabel: "Product Market Researcher Gist",
+    sourceUrl: "https://gist.github.com/iamhenry/1c7673ed2fb1d88c39110e9aab5a3170",
+    adaptationNote: "参考该 PMF research prompt 对收入、成本、目标用户与验证步骤的要求，改写为更适合黑客松和独立开发者的中文版本。",
   },
   // 创意生成分类
   {
@@ -829,6 +1007,107 @@ export const promptSeeds: PromptSeed[] = [
     sourceLabel: "Content Marketing Best Practices",
     sourceUrl: "https://github.com/browser-use/awesome-prompts",
     adaptationNote: "基于内容营销最佳实践，重写为适合生成创意内容的中文 Prompt。",
+  },
+  {
+    id: "creative-campaign-concept-lab",
+    title: "传播概念实验室",
+    category: "creative",
+    summary: "围绕受众、品牌和时间节点，一次性产出多组 campaign concept 与 wild card 创意。",
+    scenario: "适合黑客松答辩包装、品牌传播概念、产品发布活动、社媒 campaign 设计。",
+    tags: ["Campaign", "Concept", "Creative Direction", "Marketing"],
+    prompt: `请作为一名懂品牌与传播的创意总监，为下面这个产品生成一组传播创意概念。
+
+输出结构：
+1. 5 个主创意概念
+2. 1 个 wild card 概念
+3. 每个概念包含：
+   - 名称
+   - 核心洞察
+   - 一句话大 idea
+   - 适合的传播形式
+   - 预期触发的情绪
+4. 从中选出最值得执行的 3 个
+5. 说明为什么它们更适合传播
+
+要求：
+- 概念要有区分度，不要只是换措辞
+- 不要只给 slogan，要讲清背后的洞察
+- 概念必须能延展成视觉、文案和活动方向
+- 如果适合，请额外给一个“非常冒险但可能爆”的 wild card
+
+品牌 / 产品：
+{{brand_or_product}}
+
+目标受众：
+{{target_audience}}`,
+    sourceLabel: "ChatGPT Marketing Prompts - 5 Campaign Concepts, 1 Wild Card",
+    sourceUrl: "https://gist.github.com/pogla/418b702ee815b785513bc21c4ff71977",
+    adaptationNote: "参考该营销 Prompt 中多概念 + wild card 的组织方式，改写为更适合中文品牌与产品创意的版本。",
+  },
+  {
+    id: "creative-brand-identity-brief",
+    title: "品牌识别设计 Brief 生成器",
+    category: "creative",
+    summary: "把产品定位扩展成品牌名、视觉方向、语气、配色与品牌人格的完整 brief。",
+    scenario: "适合项目命名、黑客松品牌包装、Landing Page 视觉方向统一。",
+    tags: ["Brand", "Identity", "Naming", "Visual Direction"],
+    prompt: `请根据下面的产品信息，生成一份完整的品牌识别设计 brief。
+
+输出必须包含：
+1. 品牌名方向（至少 5 个）
+2. 品牌人格关键词
+3. 视觉风格方向
+4. 主色 / 辅色 / 强调色建议
+5. 字体与版式建议
+6. Logo 概念方向
+7. 语气与文案风格
+8. 一句品牌主张
+
+要求：
+- 不要只给抽象形容词
+- 所有建议都要能落实到设计与页面表现
+- 命名需要区分科技感、可信度和记忆点
+- 最后挑出一套最适合当前产品的组合方案
+
+产品信息：
+{{brand_context}}`,
+    sourceLabel: "Brand Identity Prompt Gist",
+    sourceUrl: "https://gist.github.com/kleneway/3c7364384046349acd22bc9c0d5a0b79",
+    adaptationNote: "参考该 brand identity 设计 brief 的字段范围，改写为更适合产品品牌包装的中文 Prompt。",
+  },
+  {
+    id: "creative-divergent-idea-sprint",
+    title: "发散式创意冲刺器",
+    category: "creative",
+    summary: "先大量发散，再分组、筛选、重组，帮助你在短时间内找到更有惊喜感的方向。",
+    scenario: "适合卡在命名、功能玩法、传播角度、视觉表达时快速打开发散空间。",
+    tags: ["Brainstorming", "Divergence", "Idea Sprint", "Creative Thinking"],
+    prompt: `请帮我围绕下面这个创意目标，先做一轮高强度发散，再帮我收敛。
+
+第一阶段：发散
+- 先给我 {{idea_count}} 个大胆、意外、甚至有点离谱的想法
+- 不要过早优化
+- 优先追求多样性和惊喜感
+
+第二阶段：聚类
+- 把这些想法归类成 3-5 个方向
+- 说明每个方向的共同特征
+
+第三阶段：收敛
+- 选出最值得继续推进的 3 个
+- 说明为什么
+- 给每个方向一个更适合落地的改写版
+
+要求：
+- 允许荒诞，但不能完全脱离目标
+- 不要只给同一思路的排列组合
+- 最后给一个“最保守”版本和一个“最疯狂”版本
+
+创意目标：
+{{creative_goal}}`,
+    sourceLabel: "Stanford-Inspired Creative Prompt Template",
+    sourceUrl: "https://gist.github.com/hall-jm/4a6abfbf08e7d7a220c39056b6a28dc4",
+    adaptationNote: "参考该发散优先的 creative template，改写为更适合产品命名、传播和玩法头脑风暴的中文 Prompt。",
   },
   {
     id: "codegen-fullstack-architect",

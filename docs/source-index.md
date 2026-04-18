@@ -72,6 +72,41 @@
 - 用途：补充了大规模社区 Prompt 来源，重点参考了 `Code Reviewer`、`Teacher of React.js`、`Fullstack Software Developer`、`Reverse Prompt Engineer`、`Job Interviewer` 等开发与学习相关条目。
 - 用在项目中：新增了代码生成、调试、学习、面试四类 Prompt 条目与社区精选。
 
+14. Dean Peters `product-manager-prompts`
+- URL: https://github.com/deanpeters/product-manager-prompts
+- 用途：参考产品管理中的 `jobs-to-be-done`、`positioning statement`、`user story` 等真实 PM 问题模板。
+- 用在项目中：扩充了 `product` 分类，新增定位对齐、需求优先级、产品决策类 Prompt。
+
+15. `user-story-examples`
+- URL: https://github.com/seanrioux/user-story-examples
+- 用途：参考 `As a / I want / so that`、Gherkin、acceptance criteria 与 backlog 的组织方式。
+- 用在项目中：扩充了 `product` 分类，新增更工程化的 `用户故事与 Backlog 生成器`。
+
+16. `awesome-deep-research-prompts`
+- URL: https://github.com/langgptai/awesome-deep-research-prompts
+- 用途：参考 deep research、research plan、evidence-based analysis 的写法。
+- 用在项目中：扩充了 `research` 分类，新增深度研究任务书、研究计划类 Prompt。
+
+17. `Product Market Researcher` Gist
+- URL: https://gist.github.com/iamhenry/1c7673ed2fb1d88c39110e9aab5a3170
+- 用途：参考围绕 PMF、收入空间、验证步骤、用户痛点去做产品可行性研究的结构。
+- 用在项目中：扩充了 `research` 分类，新增 `产品市场验证研究员`。
+
+18. `ChatGPT Marketing Prompts` Gist
+- URL: https://gist.github.com/pogla/418b702ee815b785513bc21c4ff71977
+- 用途：参考多组 campaign concepts、wild card ideas、传播概念筛选的组织方式。
+- 用在项目中：扩充了 `creative` 分类，新增传播概念实验室类 Prompt。
+
+19. `Brand Identity` Gist
+- URL: https://gist.github.com/kleneway/3c7364384046349acd22bc9c0d5a0b79
+- 用途：参考品牌名、logo、配色、字体、语气、品牌人格的一体化设计 brief。
+- 用在项目中：扩充了 `creative` 分类，新增品牌识别设计 Brief Prompt。
+
+20. `Stanford-Inspired Creative Prompt Template`
+- URL: https://gist.github.com/hall-jm/4a6abfbf08e7d7a220c39056b6a28dc4
+- 用途：参考先发散、再聚类、后收敛的创意头脑风暴结构。
+- 用在项目中：扩充了 `creative` 分类，新增发散式创意冲刺类 Prompt。
+
 ## 建议如何在产品里展示来源
 
 - `Official`：你内置的精选 Prompt
@@ -106,3 +141,9 @@
   - 交互式面试官
   - 算法题追问训练
   - prompts.chat 社区来源 Prompt
+  - 产品定位与 JTBD 优先级
+  - 用户故事与 Backlog 生成
+  - 深度研究任务书
+  - PMF 验证研究
+  - 传播概念与品牌识别
+  - 发散式创意冲刺

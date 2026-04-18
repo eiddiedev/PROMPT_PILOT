@@ -3,25 +3,21 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { promptSeeds, PromptSeed } from '../../../../seed/promptSeeds';
+import { usePersistentPromptState } from '../../../hooks/usePersistentPromptState';
 
 export default function PromptDetail() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
   const [prompt, setPrompt] = useState<PromptSeed | null>(null);
-  const [favorites, setFavorites] = useState<string[]>([]);
   const [copied, setCopied] = useState(false);
   const [showOptimizer, setShowOptimizer] = useState(false);
   const [optimizationFeedback, setOptimizationFeedback] = useState('');
   const [optimizedPrompt, setOptimizedPrompt] = useState('');
   const [optimizationExplanation, setOptimizationExplanation] = useState('');
   const [isOptimizing, setIsOptimizing] = useState(false);
+  const { favorites, ratings, usageCounts, toggleFavorite, setRating, recordUsage } = usePersistentPromptState();
 
   useEffect(() => {
-    const savedFavorites = localStorage.getItem('favorites');
-    if (savedFavorites) {
-      setFavorites(JSON.parse(savedFavorites));
-    }
-    
     document.body.style.opacity = '0';
     setTimeout(() => {
       document.body.style.transition = 'opacity 0.5s ease';
@@ -35,14 +31,6 @@ export default function PromptDetail() {
       setPrompt(foundPrompt || null);
     }
   }, [params.id]);
-
-  const toggleFavorite = (id: string) => {
-    const newFavorites = favorites.includes(id) 
-      ? favorites.filter(item => item !== id) 
-      : [...favorites, id];
-    setFavorites(newFavorites);
-    localStorage.setItem('favorites', JSON.stringify(newFavorites));
-  };
 
   const copyToClipboard = async (text: string) => {
     try {
@@ -58,27 +46,12 @@ export default function PromptDetail() {
     }
   };
 
-  const recordUsage = (id: string) => {
-    const usageData = JSON.parse(localStorage.getItem('promptUsage') || '{}');
-    usageData[id] = (usageData[id] || 0) + 1;
-    localStorage.setItem('promptUsage', JSON.stringify(usageData));
-  };
-
   const getUsageCount = (id: string): number => {
-    const usageData = JSON.parse(localStorage.getItem('promptUsage') || '{}');
-    return usageData[id] || 0;
+    return usageCounts[id] || 0;
   };
 
   const getEfficiency = (id: string): number => {
-    // 从本地存储获取用户评分
-    const ratingsData = JSON.parse(localStorage.getItem('promptRatings') || '{}');
-    return ratingsData[id] || 0;
-  };
-
-  const setRating = (id: string, rating: number) => {
-    const ratingsData = JSON.parse(localStorage.getItem('promptRatings') || '{}');
-    ratingsData[id] = rating;
-    localStorage.setItem('promptRatings', JSON.stringify(ratingsData));
+    return ratings[id] || 0;
   };
 
   const sharePrompt = () => {
@@ -217,6 +190,7 @@ export default function PromptDetail() {
                 <div>
                   <h1 className="font-mono text-2xl md:text-3xl font-bold mb-2">{prompt.title}</h1>
                   <p className="font-mono text-sm text-muted">{prompt.scenario}</p>
+                  <p className="mt-2 font-mono text-xs text-muted">收藏、评分和使用记录会保存在当前浏览器。</p>
                 </div>
                 <div className="flex gap-2 mt-4 md:mt-0">
                   <button 
@@ -312,11 +286,8 @@ export default function PromptDetail() {
                 <div>
                   <h3 className="font-mono font-bold text-sm mb-3">统计与评分</h3>
                   <div className="space-y-2">
-                    <p className="font-mono text-xs">
-                      <span className="font-bold">使用次数：</span>{getUsageCount(prompt.id)}
-                    </p>
                     <p className="font-mono text-xs mb-2">
-                      <span className="font-bold">用户评分：</span>{getEfficiency(prompt.id)}%
+                      <span className="font-bold">使用次数：</span>{getUsageCount(prompt.id)}
                     </p>
                     <div className="flex gap-1">
                       {[1, 2, 3, 4, 5].map(star => (

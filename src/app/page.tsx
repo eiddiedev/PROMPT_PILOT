@@ -1,50 +1,63 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { promptSeeds, communitySpotlights, PromptSeed, CommunitySpotlight } from '../../seed/promptSeeds';
+import { promptSeeds } from '../../seed/promptSeeds';
+import { usePersistentPromptState } from '../hooks/usePersistentPromptState';
 
 type PromptCategory = "codegen" | "debug" | "study" | "interview" | "community" | "product" | "research" | "creative" | 'all';
 
 export default function Home() {
   const router = useRouter();
   const [selectedCategory, setSelectedCategory] = useState<PromptCategory | 'all'>('all');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [favorites, setFavorites] = useState<string[]>([]);
+  const { favorites, ratings, usageCounts, toggleFavorite, setRating, recordUsage } = usePersistentPromptState();
 
-  useEffect(() => {
-    const savedFavorites = localStorage.getItem('favorites');
-    if (savedFavorites) {
-      setFavorites(JSON.parse(savedFavorites));
-    }
-  }, []);
+  const communityFeaturedPrompts = useMemo(() => {
+    const rankedPrompts = promptSeeds
+      .map((prompt) => {
+        const usage = usageCounts[prompt.id] || 0;
+        const rating = ratings[prompt.id] || 0;
+        const favoriteBonus = favorites.includes(prompt.id) ? 12 : 0;
+        const baselineScore =
+          (prompt.tags.includes('MVP') ? 8 : 0) +
+          (prompt.tags.includes('Debug') ? 6 : 0) +
+          (prompt.tags.includes('Learning') ? 4 : 0) +
+          Math.min(prompt.tags.length * 1.5, 6);
+        const communityScore = rating * 0.7 + Math.min(usage * 12, 100) * 0.3 + favoriteBonus + baselineScore;
 
-  useEffect(() => {
-    localStorage.setItem('favorites', JSON.stringify(favorites));
-  }, [favorites]);
+        return {
+          ...prompt,
+          category: 'community' as const,
+          summary:
+            usage > 0 || rating > 0
+              ? `来自真实使用反馈：当前评分 ${Math.round(rating / 20) || 0} 星，累计使用 ${usage} 次。`
+              : prompt.summary,
+          scenario:
+            usage > 0 || rating > 0
+              ? `高频使用 + 高评分 Prompt，适合加入社区精选推荐。原场景：${prompt.scenario}`
+              : prompt.scenario,
+          tags: [
+            `评分 ${rating > 0 ? `${Math.round(rating / 20)}★` : '0★'}`,
+            `使用 ${usage}`,
+            ...prompt.tags.slice(0, 2),
+          ],
+          communityScore,
+          rating,
+          usage,
+        };
+      })
+      .sort((a, b) => b.communityScore - a.communityScore);
 
-  const filteredPrompts = selectedCategory === 'community' 
-    ? communitySpotlights.map(spotlight => ({
-        ...spotlight,
-        summary: spotlight.recommendedFor,
-        scenario: spotlight.comparisonSummary,
-        tags: [spotlight.highlight.substring(0, 20)],
-        prompt: `# ${spotlight.title}\n\n${spotlight.recommendedFor}\n\n${spotlight.comparisonSummary}\n\n${spotlight.highlight}`,
-      }))
-    : promptSeeds.filter(prompt => {
-        const matchesCategory = selectedCategory === 'all' || prompt.category === selectedCategory;
-        const matchesSearch = searchTerm === '' || 
-          prompt.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          prompt.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase())) ||
-          prompt.scenario.toLowerCase().includes(searchTerm.toLowerCase());
-        return matchesCategory && matchesSearch;
-      });
+    return rankedPrompts.slice(0, 9);
+  }, [favorites, ratings, usageCounts]);
 
-  const toggleFavorite = (id: string) => {
-    setFavorites(prev => 
-      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
-    );
-  };
+  const filteredPrompts =
+    selectedCategory === 'community'
+      ? communityFeaturedPrompts
+      : promptSeeds.filter((prompt) => {
+          const matchesCategory = selectedCategory === 'all' || prompt.category === selectedCategory;
+          return matchesCategory;
+        });
 
   const getCategoryLabel = (category: string): string => {
     switch (category) {
@@ -60,33 +73,12 @@ export default function Home() {
     }
   };
 
-  const copyToClipboard = (text: string, id: string) => {
-    navigator.clipboard.writeText(text);
-    // 记录使用次数
-    recordUsage(id);
-  };
-
-  const recordUsage = (id: string) => {
-    const usageData = JSON.parse(localStorage.getItem('promptUsage') || '{}');
-    usageData[id] = (usageData[id] || 0) + 1;
-    localStorage.setItem('promptUsage', JSON.stringify(usageData));
-  };
-
   const getUsageCount = (id: string): number => {
-    const usageData = JSON.parse(localStorage.getItem('promptUsage') || '{}');
-    return usageData[id] || 0;
+    return usageCounts[id] || 0;
   };
 
   const getEfficiency = (id: string): number => {
-    // 从本地存储获取用户评分
-    const ratingsData = JSON.parse(localStorage.getItem('promptRatings') || '{}');
-    return ratingsData[id] || 0;
-  };
-
-  const setRating = (id: string, rating: number) => {
-    const ratingsData = JSON.parse(localStorage.getItem('promptRatings') || '{}');
-    ratingsData[id] = rating;
-    localStorage.setItem('promptRatings', JSON.stringify(ratingsData));
+    return ratings[id] || 0;
   };
 
   const handlePromptClick = (prompt: any) => {
@@ -131,18 +123,30 @@ export default function Home() {
                 <h1 className="hero-title mb-2 fade-in">PROMPT_PILOT</h1>
                 <div className="flex items-center gap-4 fade-in-delay-1">
                   <span className="source-badge bg-accent-soft text-accent border-accent">精选</span>
-                  <span className="font-mono text-xs text-muted">已索引 12 个结构化提示词</span>
+                  <span className="font-mono text-xs text-muted">已索引 {promptSeeds.length} 个结构化提示词</span>
+                  <span className="font-mono text-xs text-muted">本地持久化已开启</span>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4 mb-6">
                 <div className="border-2 border-line p-6 fade-in-delay-1 hover:border-line-strong transition-all cursor-pointer" onClick={() => router.push('/match')}>
-                  <h3 className="font-mono font-bold text-lg mb-3">🔍 匹配提示词</h3>
+                  <h3 className="font-mono font-bold text-lg mb-3">
+                    <svg className="w-5 h-5 inline-block mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <circle cx="11" cy="11" r="8"></circle>
+                      <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    匹配提示词
+                  </h3>
                   <p className="font-mono text-sm text-muted mb-4">输入你的需求，AI 将分析并匹配最适合的提示词</p>
                   <button className="btn btn-accent text-xs w-full">开始匹配</button>
                 </div>
                 <div className="border-2 border-line p-6 bg-accent-soft/20 fade-in-delay-2 hover:border-line-strong transition-all cursor-pointer" onClick={() => router.push('/optimize')}>
-                  <h3 className="font-mono font-bold text-lg mb-3">⚡ 优化/生成提示词</h3>
+                  <h3 className="font-mono font-bold text-lg mb-3">
+                    <svg className="w-5 h-5 inline-block mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                    </svg>
+                    优化/生成提示词
+                  </h3>
                   <p className="font-mono text-sm text-muted mb-4">输入你的提示词或需求，AI 将生成高效的工程规范提示词</p>
                   <button className="btn btn-accent text-xs w-full">开始优化</button>
                 </div>
@@ -152,7 +156,7 @@ export default function Home() {
             <div className="col-span-12 border-t-2 border-line-strong p-4 fade-in-delay-2">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-4">
-                  <span className="font-pixel text-xl">项目 07</span>
+                  <span className="font-pixel text-xl">Prompt Library</span>
                   <div className="h-6 w-px bg-line"></div>
                   <div className="flex gap-2">
                     {(['all', 'community', 'codegen', 'debug', 'study', 'interview', 'product', 'research', 'creative'] as PromptCategory[]).map(category => (
@@ -167,14 +171,11 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <input
-                    type="text"
-                    placeholder="搜索提示词..."
-                    className="px-3 py-2 border-2 border-line font-mono text-sm w-64"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                  <button className="btn btn-outline text-xs">排序</button>
+                  {selectedCategory === 'community' && (
+                    <span className="font-mono text-xs text-muted">
+                      社区精选按评分、使用次数和收藏热度实时生成
+                    </span>
+                  )}
                 </div>
               </div>
 
@@ -221,11 +222,9 @@ export default function Home() {
                               </button>
                             ))}
                           </div>
-                          <span className="font-mono text-xs font-bold">{getEfficiency(prompt.id)}%</span>
-                          <br />
                           <span className="text-xs text-muted">评分</span>
                         </div>
-                        <div className="border border-line p-1">
+                        <div className="border border-line p-1 flex items-center justify-center">
                           <span className="font-mono text-xs font-bold">→</span>
                         </div>
                       </div>

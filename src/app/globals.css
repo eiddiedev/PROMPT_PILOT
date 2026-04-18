@@ -1,0 +1,126 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #e8e6e1;
+  --panel: #f0f0e8;
+  --line: #c4beb4;
+  --line-strong: #4a443d;
+  --text: #000000;
+  --muted: #666666;
+  --accent: #ff5e19;
+  --accent-soft: #ffd4b8;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: var(--font-mono);
+  background-image: 
+    linear-gradient(rgba(196, 190, 180, 0.45) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(196, 190, 180, 0.45) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+@layer components {
+  .shell-frame {
+    @apply relative border-[3px] border-line-strong bg-panel shadow-[8px_8px_0px_0px_rgba(0,0,0,0.1)];
+  }
+  
+  .hero-title {
+    @apply font-pixel text-[2.4rem] md:text-[4.4rem] lg:text-[5.8rem] font-bold uppercase leading-[0.85];
+    letter-spacing: -0.12em;
+    text-shadow:
+      1px 0 0 currentColor,
+      0 1px 0 currentColor;
+    transform: translateX(-0.04em);
+  }
+  
+  .category-tab {
+    @apply px-3 py-2 border-2 border-line font-mono text-sm transition-all hover:bg-accent-soft hover:border-accent;
+  }
+  
+  .category-tab.active {
+    @apply bg-accent text-white border-accent;
+  }
+  
+  .prompt-card {
+    @apply border-2 border-line p-4 transition-all hover:translate-y-[-2px] hover:border-line-strong hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)];
+  }
+  
+  .btn {
+    @apply px-4 py-2 border-2 font-mono text-sm transition-all;
+  }
+  
+  .btn-accent {
+    @apply bg-accent text-white border-accent hover:bg-accent/90;
+  }
+  
+  .btn-outline {
+    @apply border-line hover:border-line-strong;
+  }
+  
+  .data-row {
+    @apply text-xs text-muted font-mono;
+  }
+  
+  .source-badge {
+    @apply px-2 py-1 text-xs border border-line font-mono;
+  }
+  
+  .pixel-text {
+    @apply font-pixel uppercase;
+    letter-spacing: -0.08em;
+  }
+  
+  .fade-in {
+    animation: fadeIn 0.4s ease-in-out;
+  }
+  
+  .fade-in-delay-1 {
+    animation: fadeIn 0.4s ease-in-out 0.05s both;
+  }
+  
+  .fade-in-delay-2 {
+    animation: fadeIn 0.4s ease-in-out 0.1s both;
+  }
+  
+  .fade-in-delay-3 {
+    animation: fadeIn 0.4s ease-in-out 0.15s both;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 页面过渡动画 */
+.page-enter {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.page-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.page-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.page-exit-active {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}

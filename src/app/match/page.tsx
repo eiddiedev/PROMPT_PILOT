@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { promptSeeds, type PromptSeed } from '../../../seed/promptSeeds';
 import { getMatchDemoResult, MATCH_DEMO_CASES } from '../../lib/demoCases';
@@ -188,8 +189,8 @@ export default function MatchPrompt() {
                   <span className="ml-0 font-mono text-xs text-muted md:ml-4">/ MATCH</span>
                 </div>
                 <div className="flex items-center gap-4">
-                  <a href="/" className="border-b border-transparent pb-1 font-mono text-sm hover:border-accent hover:text-accent">库</a>
-                  <a href="/favorites" className="border-b border-transparent pb-1 font-mono text-sm hover:border-accent hover:text-accent">收藏</a>
+                  <Link href="/" className="border-b border-transparent pb-1 font-mono text-sm hover:border-accent hover:text-accent">库</Link>
+                  <Link href="/favorites" className="border-b border-transparent pb-1 font-mono text-sm hover:border-accent hover:text-accent">收藏</Link>
                 </div>
               </div>
             </div>

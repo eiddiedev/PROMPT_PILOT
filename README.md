@@ -4,6 +4,15 @@
 
 `PROMPT_PILOT` 不是一个普通的 Prompt 收藏夹，而是把 Prompt 当成`可分析、可进化、可推荐、可沉淀`的工作流资产来管理。
 
+## Status
+
+这个仓库已经从黑客松 MVP 整理为可持续维护的开源项目基础版本。
+
+- 可直接本地运行
+- 无 `DEEPSEEK_API_KEY` 时仍可使用本地回退分析
+- 内置 Prompt 种子带来源索引与改写说明
+- 已补充 lint、test、build 的基础校验链路
+
 ## Core Highlights
 
 ### 1. Prompt Match
@@ -122,6 +131,23 @@
 - React 18
 - TypeScript
 - Tailwind CSS
+- Vitest
+
+## Demo Scope
+
+当前版本重点展示四件事：
+
+- Prompt 主库浏览、收藏、评分与本地持久化
+- 基于任务描述的 Prompt Match
+- 基于反馈的 Prompt Evolution
+- 可解释的 Prompt DNA 画像
+
+暂未覆盖：
+
+- 多用户系统
+- 云端同步
+- 社区上传审核
+- 真正的版本历史与协作工作流
 
 ## Local Development
 
@@ -139,6 +165,11 @@ Create `.env.local`:
 DEEPSEEK_API_KEY=your_api_key_here
 ```
 
+`DEEPSEEK_API_KEY` 是可选的。
+
+- 配置后：`/match` 和 `/optimize` 会优先调用 DeepSeek
+- 未配置时：应用会自动回退到本地分析逻辑，方便本地开发、演示和测试
+
 ### Run
 
 ```bash
@@ -154,6 +185,8 @@ http://localhost:3000
 ### Production Build
 
 ```bash
+npm run lint
+npm run test
 npm run build
 npm run start
 ```
@@ -163,11 +196,30 @@ npm run start
 ```text
 src/app/                 app routes
 src/components/          reusable UI components
+src/lib/                 prompt insights, optimization helpers, persistence
 seed/promptSeeds.ts      prompt seeds + community spotlights
 docs/source-index.md     source references
 docs/ui-style-spec.md    visual system
 docs/traesolo-prompt-v2.md
 ```
+
+## Quality Gates
+
+```bash
+npm run lint
+npm run test
+npm run build
+```
+
+CI runs the same checks on every pull request.
+
+## Contributing
+
+欢迎提 issue 和 PR。
+
+- 贡献说明见 [CONTRIBUTING.md](./CONTRIBUTING.md)
+- 社区行为准则见 [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md)
+- 安全问题请看 [SECURITY.md](./SECURITY.md)
 
 ## Design Direction
 
@@ -188,5 +240,11 @@ docs/traesolo-prompt-v2.md
 
 ## License
 
-项目代码默认按仓库所有者意图管理。  
-第三方 Prompt 来源请以各自仓库许可证为准；其中部分来源如 `prompts.chat` 为 `CC0-1.0`。
+项目代码采用 [MIT](./LICENSE) 许可证。
+
+关于内置 Prompt 数据，需要额外注意：
+
+- 仓库内 Prompt 种子是基于公开来源进行筛选、重组与改写后的产品化内容
+- 来源索引见 [docs/source-index.md](./docs/source-index.md)
+- 第三方 Prompt 原始内容仍受各自许可证约束
+- 若你计划将内置 Prompt 数据单独二次分发，请先核对对应来源许可证与使用范围

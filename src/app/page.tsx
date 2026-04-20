@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { promptSeeds } from '../../seed/promptSeeds';
 import { usePersistentPromptState } from '../hooks/usePersistentPromptState';
@@ -111,7 +112,7 @@ export default function Home() {
                 <span className="text-xs text-muted font-mono ml-4">/ LAB</span>
               </div>
               <div className="flex items-center gap-4">
-                <a href="/" className="font-mono text-sm hover:text-accent border-b border-transparent hover:border-accent pb-1">库</a>
+                <Link href="/" className="font-mono text-sm hover:text-accent border-b border-transparent hover:border-accent pb-1">库</Link>
                 <button className="btn btn-outline text-xs" onClick={() => router.push('/favorites')}>
                   收藏 ({favorites.length})
                 </button>
@@ -171,11 +172,6 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
-                  {selectedCategory === 'community' && (
-                    <span className="font-mono text-xs text-muted">
-                      社区精选按评分、使用次数和收藏热度实时生成
-                    </span>
-                  )}
                 </div>
               </div>
 

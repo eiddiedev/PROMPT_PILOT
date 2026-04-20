@@ -1,9 +1,11 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
 import { promptSeeds, PromptSeed } from '../../../../seed/promptSeeds';
 import { usePersistentPromptState } from '../../../hooks/usePersistentPromptState';
+import { createLocalOptimizationResult, fetchPromptOptimization } from '../../../lib/promptOptimization';
 
 export default function PromptDetail() {
   const router = useRouter();
@@ -14,6 +16,7 @@ export default function PromptDetail() {
   const [optimizationFeedback, setOptimizationFeedback] = useState('');
   const [optimizedPrompt, setOptimizedPrompt] = useState('');
   const [optimizationExplanation, setOptimizationExplanation] = useState('');
+  const [optimizationSource, setOptimizationSource] = useState<'deepseek' | 'local' | null>(null);
   const [isOptimizing, setIsOptimizing] = useState(false);
   const { favorites, ratings, usageCounts, toggleFavorite, setRating, recordUsage } = usePersistentPromptState();
 
@@ -79,49 +82,26 @@ export default function PromptDetail() {
     }
   };
 
-  const optimizePromptLocally = (originalPrompt: string, feedback: string) => {
-    let optimized = originalPrompt;
-    let explanation = '优化说明：\n';
-
-    if (feedback.includes('结构') || feedback.includes('格式')) {
-      optimized = `# 目标与角色\n${optimized}\n\n# 输出格式要求\n- 严格按照指定格式输出\n- 确保结构清晰，层次分明\n- 使用 Markdown 格式化结果\n- 每个部分都要有明确的标题`;
-      explanation += '1. 添加了清晰的目标与角色部分\n2. 补充了输出格式要求\n3. 确保了结构的清晰度\n';
-    }
-
-    if (feedback.includes('边界') || feedback.includes('错误')) {
-      optimized += `\n\n# 边界条件与错误处理\n- 请考虑 null/undefined 的情况\n- 处理空数组和空字符串\n- 添加适当的错误处理逻辑\n- 确保异常情况下也有合理的输出`;
-      explanation += '4. 添加了边界条件处理\n5. 补充了错误处理要求\n';
-    }
-
-    if (feedback.includes('示例') || feedback.includes('测试')) {
-      optimized += `\n\n# 示例与验证\n- 请提供至少 2 个输入输出示例\n- 包含正常情况和边界情况\n- 说明如何验证结果的正确性\n- 提供简单的测试用例`;
-      explanation += '6. 添加了示例要求\n7. 补充了验证方法\n';
-    }
-
-    if (feedback.includes('初学者') || feedback.includes('入门')) {
-      optimized = optimized.replace(/资深|专家/g, '耐心的导师');
-      optimized += `\n\n# 说明与教学\n- 解释每一步的原因\n- 举简单易懂的例子\n- 避免使用过于复杂的术语\n- 确保初学者也能理解`;
-      explanation += '8. 调整了语气，更适合初学者\n9. 添加了教学说明要求\n';
-    }
-
-    if (!explanation.includes('1.')) {
-      explanation += '1. 保持了原提示词的核心内容\n2. 优化了整体结构和可读性\n3. 确保了提示词的工程规范性\n';
-    }
-
-    return { optimized, explanation };
-  };
-
-  const handleOptimize = () => {
+  const handleOptimize = async () => {
     if (!prompt || !optimizationFeedback.trim()) return;
-    
+
     setIsOptimizing(true);
-    
-    setTimeout(() => {
-      const result = optimizePromptLocally(prompt.prompt, optimizationFeedback);
-      setOptimizedPrompt(result.optimized);
+    setOptimizationSource(null);
+
+    try {
+      const result = await fetchPromptOptimization(prompt.prompt, optimizationFeedback);
+      setOptimizedPrompt(result.optimizedPrompt);
       setOptimizationExplanation(result.explanation);
+      setOptimizationSource(result.source);
+    } catch (error) {
+      console.error('Prompt detail optimize failed, falling back to local analysis:', error);
+      const result = createLocalOptimizationResult(prompt.prompt, optimizationFeedback);
+      setOptimizedPrompt(result.optimizedPrompt);
+      setOptimizationExplanation(result.explanation);
+      setOptimizationSource(result.source);
+    } finally {
       setIsOptimizing(false);
-    }, 1000);
+    }
   };
 
   if (!prompt) {
@@ -162,7 +142,7 @@ export default function PromptDetail() {
                 <span className="text-xs text-muted font-mono ml-4">/ LAB</span>
               </div>
               <div className="flex items-center gap-4">
-                <a href="/" className="font-mono text-sm hover:text-accent border-b border-transparent hover:border-accent pb-1">库</a>
+                <Link href="/" className="font-mono text-sm hover:text-accent border-b border-transparent hover:border-accent pb-1">库</Link>
                 <button className="btn btn-outline text-xs" onClick={() => router.push('/favorites')}>
                   收藏 ({favorites.length})
                 </button>
@@ -234,7 +214,14 @@ export default function PromptDetail() {
                   {optimizedPrompt && (
                     <div className="mt-6 space-y-4">
                       <div className="border-2 border-line p-4 bg-bg">
-                        <h4 className="font-mono font-bold text-xs mb-2">优化后的提示词</h4>
+                        <div className="mb-2 flex items-center justify-between gap-2">
+                          <h4 className="font-mono font-bold text-xs">优化后的提示词</h4>
+                          {optimizationSource && (
+                            <span className="source-badge border-accent text-accent">
+                              {optimizationSource === 'deepseek' ? 'DeepSeek 优化分析' : '本地回退分析'}
+                            </span>
+                          )}
+                        </div>
                         <pre className="font-mono text-xs whitespace-pre-wrap mb-2">{optimizedPrompt}</pre>
                         <button 
                           className="btn btn-outline text-xs"

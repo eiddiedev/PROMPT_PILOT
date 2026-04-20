@@ -1,9 +1,11 @@
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { getOptimizeDemoResult, OPTIMIZE_DEMO_CASES } from '../../lib/demoCases';
-import { buildPromptEvolution, type PromptDna } from '../../lib/promptInsights';
+import { type PromptDna } from '../../lib/promptInsights';
+import { createLocalOptimizationResult, fetchPromptOptimization } from '../../lib/promptOptimization';
 
 const FEEDBACK_EXAMPLES = [
   '输出不够结构化，而且缺少明确的输出格式。',
@@ -101,22 +103,7 @@ export default function OptimizePrompt() {
     setAnalysisSource(null);
 
     try {
-      const response = await fetch('/api/optimize', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          originalPrompt,
-          feedback,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('optimize api failed');
-      }
-
-      const result = await response.json();
+      const result = await fetchPromptOptimization(originalPrompt, feedback);
 
       setOptimizedPrompt(result.optimizedPrompt);
       setExplanation(result.explanation);
@@ -127,10 +114,7 @@ export default function OptimizePrompt() {
       setAnalysisSource(result.source === 'deepseek' ? 'deepseek' : 'local');
     } catch (error) {
       console.error('Optimize page failed, falling back to local analysis:', error);
-      const result = buildPromptEvolution(
-        originalPrompt,
-        feedback.trim() || '请让这个 Prompt 更结构化、更具体、更适合工程场景。',
-      );
+      const result = createLocalOptimizationResult(originalPrompt, feedback);
 
       setOptimizedPrompt(result.optimizedPrompt);
       setExplanation(result.explanation);
@@ -138,7 +122,7 @@ export default function OptimizePrompt() {
       setFeedbackTags(result.feedbackTags);
       setBeforeDna(result.beforeDna);
       setAfterDna(result.afterDna);
-      setAnalysisSource('local');
+      setAnalysisSource(result.source);
     } finally {
       setLoading(false);
     }
@@ -183,8 +167,8 @@ export default function OptimizePrompt() {
                   <span className="ml-0 font-mono text-xs text-muted md:ml-4">/ OPTIMIZE</span>
                 </div>
                 <div className="flex items-center gap-4">
-                  <a href="/" className="border-b border-transparent pb-1 font-mono text-sm hover:border-accent hover:text-accent">库</a>
-                  <a href="/favorites" className="border-b border-transparent pb-1 font-mono text-sm hover:border-accent hover:text-accent">收藏</a>
+                  <Link href="/" className="border-b border-transparent pb-1 font-mono text-sm hover:border-accent hover:text-accent">库</Link>
+                  <Link href="/favorites" className="border-b border-transparent pb-1 font-mono text-sm hover:border-accent hover:text-accent">收藏</Link>
                 </div>
               </div>
             </div>

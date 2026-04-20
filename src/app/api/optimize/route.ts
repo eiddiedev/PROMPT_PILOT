@@ -1,16 +1,11 @@
 import { NextResponse } from 'next/server';
-import { buildPromptEvolution, scorePromptDna } from '../../../lib/promptInsights';
 import { callDeepSeekJson } from '../../../lib/deepseek';
-
-type OptimizeResponse = {
-  optimizedPrompt: string;
-  explanation: string;
-  changes: string[];
-  feedbackTags: string[];
-  beforeDna: ReturnType<typeof scorePromptDna>;
-  afterDna: ReturnType<typeof scorePromptDna>;
-  source: 'deepseek' | 'local';
-};
+import {
+  createAiOptimizationResult,
+  createLocalOptimizationResult,
+  normalizeOptimizationFeedback,
+  type PromptOptimizationAiResponse,
+} from '../../../lib/promptOptimization';
 
 export async function POST(request: Request) {
   try {
@@ -22,15 +17,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'originalPrompt is required' }, { status: 400 });
     }
 
-    const normalizedFeedback = feedback || '请让这个 Prompt 更结构化、更具体、更适合工程场景。';
+    const normalizedFeedback = normalizeOptimizationFeedback(feedback);
 
     try {
-      const aiResult = await callDeepSeekJson<{
-        optimizedPrompt: string;
-        explanation: string;
-        changes: string[];
-        feedbackTags: string[];
-      }>({
+      const aiResult = await callDeepSeekJson<PromptOptimizationAiResponse>({
         systemPrompt:
           'You are a senior prompt engineer for AI coding and learning workflows. Always return valid JSON only. Improve prompts to be more structured, reliable, and reusable.',
         userPrompt: [
@@ -52,29 +42,13 @@ export async function POST(request: Request) {
       });
 
       if (aiResult.optimizedPrompt) {
-        const response: OptimizeResponse = {
-          optimizedPrompt: aiResult.optimizedPrompt,
-          explanation: aiResult.explanation || 'DeepSeek 已基于反馈对 Prompt 的结构和约束进行了增强。',
-          changes: Array.isArray(aiResult.changes) ? aiResult.changes.slice(0, 6) : [],
-          feedbackTags: Array.isArray(aiResult.feedbackTags) ? aiResult.feedbackTags.slice(0, 4) : [],
-          beforeDna: scorePromptDna(originalPrompt),
-          afterDna: scorePromptDna(aiResult.optimizedPrompt),
-          source: 'deepseek',
-        };
-
-        return NextResponse.json(response);
+        return NextResponse.json(createAiOptimizationResult(originalPrompt, aiResult));
       }
     } catch (error) {
       console.error('DeepSeek optimize failed, falling back to local analysis:', error);
     }
 
-    const fallback = buildPromptEvolution(originalPrompt, normalizedFeedback);
-    const fallbackResponse: OptimizeResponse = {
-      ...fallback,
-      source: 'local',
-    };
-
-    return NextResponse.json(fallbackResponse);
+    return NextResponse.json(createLocalOptimizationResult(originalPrompt, normalizedFeedback));
   } catch (error) {
     console.error('Optimize API failed:', error);
     return NextResponse.json({ error: 'optimize analysis failed' }, { status: 500 });
